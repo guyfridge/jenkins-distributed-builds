@@ -95,4 +95,5 @@ EOF
 1. https://cloud.google.com/architecture/using-jenkins-for-distributed-builds-on-compute-engine
 2. https://stackoverflow.com/questions/28213232/docker-error-jq-error-cannot-iterate-over-null
 3. https://stackoverflow.com/questions/52684656/the-zone-does-not-have-enough-resources-available-to-fulfill-the-request-the-re
+4. https://stackoverflow.com/questions/73337907/packer-build-json-file-for-linux-image-creation-builds-finished-but-no-artifact
 
