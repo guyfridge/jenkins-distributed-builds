@@ -49,7 +49,50 @@ gcloud compute project-info describe \
 echo "$USER:$(cat ~/.ssh/id_rsa.pub)" >> sshKeys.pub
 gcloud compute project-info add-metadata --metadata-from-file ssh-keys=sshKeys.pub
 ```
-3. 
+## Create the base image for the Compute Engine instances
+Next we will use Packer to create a base image for our Compute Engine VMs which will act as on-demand temporary build executors in Jenkins. You can customize your build image by adding shell commands to the `provisioners` section of the Packer configuration or by adding other Packer provisioners. 
+1. Download and install the latest build of Packer from the Hashicorp website. The following command is using version 1.9.1.
+```
+wget https://releases.hashicorp.com/packer/1.9.1/packer_1.9.1_linux_amd64.zip
+unzip packer_1.9.1_linux_amd64.zip
+```
+2. Create the configuration file for your Packer image builds
+```
+export PROJECT=$(gcloud info --format='value(config.project)')
+cat > jenkins-agent.json <<EOF
+{
+  "builders": [
+    {
+      "type": "googlecompute",
+      "project_id": "$PROJECT",
+      "source_image_family": "ubuntu-2004-lts",
+      "source_image_project_id": "ubuntu-os-cloud",
+      "zone": "us-central1-a",
+      "disk_size": "50",
+      "image_name": "jenkins-agent-{{timestamp}}",
+      "image_family": "jenkins-agent",
+      "ssh_username": "ubuntu"
+    }
+  ],
+  "provisioners": [
+    {
+      "valid_exit_codes": ["0", "1", "2"],  
+      "type": "shell",
+      "inline": ["sudo apt-get update && sudo apt-get install -y default-jdk"]
+    }
+  ]
+}
+EOF
+```
+3. Build the image by executing Packer
+`./packer build jenkins-agent.json`
+4. 
 
 
+
+
+# Resources
+1. https://cloud.google.com/architecture/using-jenkins-for-distributed-builds-on-compute-engine
+2. https://stackoverflow.com/questions/28213232/docker-error-jq-error-cannot-iterate-over-null
+3. https://stackoverflow.com/questions/52684656/the-zone-does-not-have-enough-resources-available-to-fulfill-the-request-the-re
 
