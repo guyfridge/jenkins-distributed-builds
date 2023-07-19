@@ -67,7 +67,7 @@ cat > jenkins-agent.json <<EOF
       "project_id": "$PROJECT",
       "source_image_family": "ubuntu-2004-lts",
       "source_image_project_id": "ubuntu-os-cloud",
-      "zone": "us-central1-a",
+      "zone": ["us-central1-a", "us-central1-b", "us-central1-c"],
       "disk_size": "50",
       "image_name": "jenkins-agent-{{timestamp}}",
       "image_family": "jenkins-agent",
@@ -96,4 +96,6 @@ EOF
 2. https://stackoverflow.com/questions/28213232/docker-error-jq-error-cannot-iterate-over-null
 3. https://stackoverflow.com/questions/52684656/the-zone-does-not-have-enough-resources-available-to-fulfill-the-request-the-re
 4. https://stackoverflow.com/questions/73337907/packer-build-json-file-for-linux-image-creation-builds-finished-but-no-artifact
+5. https://stackoverflow.com/questions/52586941/got-an-error-zone-resource-pool-exhausted-when-creating-a-new-instance-on-goog
+6. https://groups.google.com/g/gce-discussion/c/nV1Ym57OCj8
 
