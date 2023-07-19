@@ -28,11 +28,10 @@ gcloud projects add-iam-policy-binding $PROJECT --role roles/iam.serviceAccountA
     --member serviceAccount:$SA_EMAIL
 ```
 ## Create the service account key to authenticate with the Compute Engine API in the future
-1. Create the service account key and download it to your local machine for future use when configuring the JClouds plugin to authenticate with the Compute Engine API
+1. Create the service account key and download it to your local machine for future use when configuring the JClouds plugin to authenticate with the Compute Engine API. The following command will generate a key file called `jenkins-sa.json`.
 ```
 gcloud iam service-accounts keys create jenkins-sa.json --iam-account $SA_EMAIL
-```
-The above command will generate a key file called `jenkins-sa.json`. 
+``` 
 2. Click the button at the top of the cloud console that consists of three vertically stacked dots. Then click "Download File".
 3. Click the folder icon then click the arrow next to the directory that pops up to browse a list of files. Find the `jenkins-sa.json` file and click it.
 4. Click "download" to save the file to your local machine
