@@ -1,11 +1,12 @@
 # jenkins-distributed-builds-gke
 Create a continuous integration system using on demand Jenkins agents and Compute Engine
+
 # Overview
 1. Create a new project in Google Cloud
 2. Create a service account and grant it the required priviledges
-3. 
+3. Create a Jenkins agent image
 
-## Create a service account from the cloud console inside your new project and grant it the requisite priviledges
+# Create a service account from the cloud shell inside your new project and grant it the requisite priviledges
 1. Use the gcloud command to create the service account
 `gcloud iam service-accounts create jenkins --display-name jenkins`
 2. Store your service account email address and Google Cloud Project ID in environment variables for future use
@@ -35,6 +36,20 @@ gcloud iam service-accounts keys create jenkins-sa.json --iam-account $SA_EMAIL
 2. Click the button at the top of the cloud console that consists of three vertically stacked dots. Then click "Download File".
 3. Click the folder icon then click the arrow next to the directory that pops up to browse a list of files. Find the `jenkins-sa.json` file and click it.
 4. Click "download" to save the file to your local machine
+# Create a Jenkins agent image
+We will create a base image for a Compute Engine instance that can be reused when needed and that will contain the necessary software and tools to act as the Jenkins Executor.
+## Create an SSH key
+Later we will use Packer to build images, which requires SSH to communicate with the build instances. To enable SSH, we must create an SSH key from the cloud shell. 
+1. The following command will check for an existing SSH key and use it if it exists, else, it will create a new key pair. 
+`ls ~/.ssh/id_rsa.pub || ssh-keygen -N ""`
+2. Add the public key to your project's metadata. If you receive a jq error similar to the following `jq: error (at <stdin>:247): Cannot iterate over null (null)`, try adding a `?` directly after the `[]` in the following code block.
+```
+gcloud compute project-info describe \
+    --format=json | jq -r '.commonInstanceMetadata.items[] | select(.key == "ssh-keys") | .value' > sshKeys.pub
+echo "$USER:$(cat ~/.ssh/id_rsa.pub)" >> sshKeys.pub
+gcloud compute project-info add-metadata --metadata-from-file ssh-keys=sshKeys.pub
+```
+3. 
 
 
 
