@@ -67,7 +67,7 @@ cat > jenkins-agent.json <<EOF
       "project_id": "$PROJECT",
       "source_image_family": "ubuntu-2004-lts",
       "source_image_project_id": "ubuntu-os-cloud",
-      "zone": ["us-central1-a", "us-central1-b", "us-central1-c"],
+      "zone": "us-central1-f",
       "disk_size": "50",
       "image_name": "jenkins-agent-{{timestamp}}",
       "image_family": "jenkins-agent",
