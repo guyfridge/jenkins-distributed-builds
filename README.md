@@ -96,7 +96,7 @@ Build 'googlecompute' finished after 3 minutes 14 seconds.
 ==> Builds finished. The artifacts of successful builds are:
 --> googlecompute: A disk image was created: jenkins-agent-1689889295
 ```
-## Install Jenkins
+# Install Jenkins
 We will use Cloud Marketplace by Bitnami to provision a Jenkins instance that can use the image we built in the previous section.
 1. Go to Cloud Marketplace for Jenkins
 2. Click on Launch
@@ -157,7 +157,96 @@ Under Clouds and at the bottom of the Compute Engine configuration panel from th
 13. Under "Size" enter `50`
 14. Click "Save"
 
-## Create a Jenkins job to test the configuration
+# Create a Jenkins job to test the configuration
+1. From the Jenkins dashboard, click "Create a job"
+2. Enter `test` as the item name
+3. Click "Freestyle project"
+4. Click "OK"
+5. Select the "Execute concurrent builds if necessary" and "Restrict where this project can be run boxes"
+6. Under "Label Expression" enter `ubuntu-2004`
+7. Under "Build Steps" click "Add build step" and select "Execute shell"
+8. Enter `echo "This is a test!"` into the text box
+9. Click "Save"
+10. Click the "Build Now" tab to start the build
+
+# Upload build artifacts to Cloud Storage
+More than likely, you will want to upload artifacts from your builds to Cloud Storage for future analysis or testing. We can configure our Jenkins job to generate a log and build artifact that are both uploaded to Cloud Storage.
+1. From Cloud Shell, create a storage bucket for the build artifacts
+```
+export PROJECT=$(gcloud info --format='value(config.project)')
+gsutil mb gs://$PROJECT-jenkins-artifacts
+```
+2. In the jobs list on the Jenkins UI, select the job we just created. Then click "Configure".
+3. Under "Build Steps" change the command text field to `env > build_environment.txt`
+4. Under "Post-build Actions" click "Add post-build action"
+5. Click "Google Cloud Storage Plugin"
+6. Under "Storage Location" enter `gs://[YOUR_PROJECT_ID]-jenkins-artifacts/$JOB_NAME/$BUILD_NUMBER` but substitute your Google Cloud Project ID where indicated
+7. Click "Add Operation" and then select "Classic Upload"
+8. Under the "File Pattern" heading enter `build_environment.txt`
+9. Under "Storage Location" enter `gs://[YOUR_PROJECT_ID]-jenkins-artifacts/$JOB_NAME/$BUILD_NUMBER` but substitute your Google Cloud Project ID where indicated
+10. Click the "For failed jobs?" box
+11. Click "Save"
+12. Click the "Build Now" tab to begin the build
+13. From Cloud Shell, access the build artifact using the `gsutil` command
+```
+export PROJECT=$(gcloud info --format='value(config.project)')
+gsutil cat gs://$PROJECT-jenkins-artifacts/test/2/build_environment.txt
+```
+## Manage artifact lifecycle
+Most likely, you will typically be accessing recent build artifacts rather than older ones. To save costs, use object lifecycle management to move older artifacts from higher-performance storage classes to lower-cost and higher-latency storage classes.
+1. From Cloud Shell, create a lifecycle configuration file that transfers all build artifacts to Nearline storage after 30 days and all Nearline objects to Coldline storage after 365 days
+```
+cat > artifact-lifecycle.json <<EOF
+{
+"lifecycle": {
+  "rule": [
+  {
+    "action": {
+      "type": "SetStorageClass",
+      "storageClass": "NEARLINE"
+    },
+    "condition": {
+      "age": 30,
+      "matchesStorageClass": ["MULTI_REGIONAL", "STANDARD", "DURABLE_REDUCED_AVAILABILITY"]
+    }
+  },
+  {
+    "action": {
+      "type": "SetStorageClass",
+      "storageClass": "COLDLINE"
+    },
+    "condition": {
+      "age": 365,
+      "matchesStorageClass": ["NEARLINE"]
+    }
+  }
+]
+}
+}
+EOF
+```
+2. Upload the configuration file to your artifact storage bucket
+```
+export PROJECT=$(gcloud info --format='value(config.project)')
+gsutil lifecycle set artifact-lifecycle.json gs://$PROJECT-jenkins-artifacts
+```
+# Deleting Resources
+1. Delete any Jenkins agents that are still running
+`gcloud compute instances list --filter=metadata.jclouds-group=ubuntu-2004 --uri | xargs gcloud compute instances delete`
+2. Using Cloud Deployment Manager, delete the Jenkins instance
+`gcloud deployment-manager deployments delete jenkins-1`
+3. Delete the Cloud Storage bucket
+```
+export PROJECT=$(gcloud info --format='value(config.project)')
+gsutil -m rm -r gs://$PROJECT-jenkins-artifacts
+```
+4. Delete the Service Account
+```
+export SA_EMAIL=$(gcloud iam service-accounts list --filter="displayName:jenkins" --format='value(email)')
+gcloud iam service-accounts delete $SA_EMAIL
+```
+
+
 
 
 
