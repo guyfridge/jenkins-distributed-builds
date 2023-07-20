@@ -1,4 +1,4 @@
-# jenkins-distributed-builds-gke
+# jenkins-distributed-builds
 Create a continuous integration system using on demand Jenkins agents and Compute Engine
 
 # Overview
