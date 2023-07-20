@@ -63,6 +63,7 @@ cat > jenkins-agent.json <<EOF
 {
   "builders": [
     {
+      "machine_type": "n2-standard-1",
       "type": "googlecompute",
       "project_id": "$PROJECT",
       "source_image_family": "ubuntu-2004-lts",
