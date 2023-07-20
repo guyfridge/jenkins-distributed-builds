@@ -87,8 +87,77 @@ EOF
 ```
 3. Build the image by executing Packer
 `./packer build jenkins-agent.json`
-4. 
+4. A successful build will yield an output similar to the following
+```
+Build 'googlecompute' finished after 3 minutes 14 seconds.
 
+==> Wait completed after 3 minutes 14 seconds
+
+==> Builds finished. The artifacts of successful builds are:
+--> googlecompute: A disk image was created: jenkins-agent-1689889295
+```
+## Install Jenkins
+We will use Cloud Marketplace by Bitnami to provision a Jenkins instance that can use the image we built in the previous section.
+1. Go to Cloud Marketplace for Jenkins
+2. Click on Launch
+3. Enable the required APIs
+4. Add the correct zone to the configuration
+5. Change the Machine Type field to 4 vCPUs 15 GB Memory, n1-standard-4.
+6. Click "Deploy"
+7. Navigate to the Jenkins login page by clicking "Site Address"
+8. Log in to Jenkins using the Admin User credentials listed on the details panel
+9. Jenkins is now ready to use. If you experience a 404 error after logging in, simply remove `/jenkins` after the IP address in your browser and it will take you to the Jenkins dashboard.
+
+## Configure Jenkins
+First we must install plugins that will allow Jenkins to create agents using Compute Engine and store artifacts from those agents in Cloud Storage.
+### Install plugins
+1. From the Jenkins dashboard, click "Manage Jenkins"
+2. Click "Plugins"
+3. Click the "Available Plugins" tab
+4. Use the filter to search for the "Google Compute Engine" and "Google Cloud Storage" plugins
+5. Select these plugins and click "Download now and install after restart"
+6. Click the "Restart Jenkins when installation is complete and no jobs are running" checkbox
+
+### Create plugin credentials
+1. From the Jenkins dashboard, click "Manage Jenkins"
+2. Click "Credentials"
+3. Under the heading "Stores scoped to Jenkins" click the downward arrow next to "global" and select "Add credentials"
+4. Set Kind to Google Service Account from private key
+5. In the Project Name field, enter your Google Cloud project ID
+6. Next to the JSON key option click "Choose File"
+7. Add the `jenkins-sa.json` key that you downloaded to your local machine earlier
+8. Click "Create"
+
+### Configure Compute Engine plugin
+Configure the Jenkins Compute Engine plugin with the credentials it uses to provision agent instances.
+1. From the Jenkins dashboard, click "Manage Jenkins"
+2. Click "Nodes and Clouds"
+3. Click the "Clouds" tab
+4. Click "Add" and select "Compute Engine"
+5. Under the "Name" field enter `gce`
+6. Under the "Project ID" field enter your Google Cloud project ID
+7. Under the "Instance Cap" field enter `8`
+8. Under "Service Account Credentials" select your service account which will be listed as your Google Cloud project ID
+9. Click "Save"
+
+### Configure Jenkins instance configurations
+Under Clouds and at the bottom of the Compute Engine configuration panel from the last section, there is a section called "Instance Configurations" that we will use to configure our agent VMs.
+1. Click "Add"
+2. Under the "Name Prefix" field enter `ubuntu-2004`
+3. Under the "Description" field enter `Ubuntu agent`
+4. Under the "Labels" field enter `ubuntu-2004`
+5. Under the "Region" field select "us-central1"
+6. Under the "Zone" field select "us-central1-f"
+7. Click "Advanced"
+8. Under the "Machine Type" field select "n1-standard-1"
+9. Under "Networking" select the "default" setting for both the "Network" and "Subnetwork" fields
+10. Check the "Attach External IP?" box
+11. Under "Boot Disk" select your Google Cloud project ID under the "Image project" field
+12. Under "Image name" select the image you built earlier using Packer
+13. Under "Size" enter `50`
+14. Click "Save"
+
+## Create a Jenkins job to test the configuration
 
 
 
