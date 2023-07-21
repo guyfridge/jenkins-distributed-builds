@@ -1,11 +1,12 @@
 # jenkins-distributed-builds
-Create a continuous integration system using on demand Jenkins agents and Compute Engine
+Create a continuous integration system using on-demand Jenkins agents and Compute Engine
 
 # Overview
-1. Create a new project in Google Cloud
-2. Create a service account and grant it the required priviledges
-3. Create a Jenkins agent image
-
+1. Create a Jenkins agent image with Packer from which on-demand Jenkins agents can be built in the future
+2. Deploy Jenkins using Cloud Marketplace
+3. Configure Jenkins deployment with required plugins for launching Jenkins agents and storing build artifacts in Cloud Storage
+4. Configure lifecycle policies to optimize Cloud Storage costs of long-term build artifact storage
+ 
 # Create a service account from the cloud shell inside your new project and grant it the requisite priviledges
 1. Use the gcloud command to create the service account
 `gcloud iam service-accounts create jenkins --display-name jenkins`
