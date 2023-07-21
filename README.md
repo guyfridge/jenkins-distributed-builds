@@ -231,26 +231,6 @@ EOF
 export PROJECT=$(gcloud info --format='value(config.project)')
 gsutil lifecycle set artifact-lifecycle.json gs://$PROJECT-jenkins-artifacts
 ```
-# Deleting Resources
-1. Delete any Jenkins agents that are still running
-`gcloud compute instances list --filter=metadata.jclouds-group=ubuntu-2004 --uri | xargs gcloud compute instances delete`
-2. Using Cloud Deployment Manager, delete the Jenkins instance
-`gcloud deployment-manager deployments delete jenkins-1`
-3. Delete the Cloud Storage bucket
-```
-export PROJECT=$(gcloud info --format='value(config.project)')
-gsutil -m rm -r gs://$PROJECT-jenkins-artifacts
-```
-4. Delete the Service Account
-```
-export SA_EMAIL=$(gcloud iam service-accounts list --filter="displayName:jenkins" --format='value(email)')
-gcloud iam service-accounts delete $SA_EMAIL
-```
-
-
-
-
-
 # Resources
 1. https://cloud.google.com/architecture/using-jenkins-for-distributed-builds-on-compute-engine
 2. https://stackoverflow.com/questions/28213232/docker-error-jq-error-cannot-iterate-over-null
