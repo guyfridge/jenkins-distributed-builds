@@ -99,7 +99,7 @@ Build 'googlecompute' finished after 3 minutes 14 seconds.
 ```
 # Install Jenkins
 We will use Cloud Marketplace by Bitnami to provision a Jenkins instance that can use the image we built in the previous section.
-1. Go to Cloud Marketplace for Jenkins
+1. Go to [Cloud Marketplace](https://console.cloud.google.com/marketplace/details/bitnami-launchpad/jenkins?q=jenkins&_ga=2.238150784.104591001.1690832064-1245473738.1681313443&project=gke-cluster-practice2) for Jenkins
 2. Click on Launch
 3. Enable the required APIs
 4. Add the correct zone to the configuration
