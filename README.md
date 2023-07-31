@@ -51,8 +51,8 @@ echo "$USER:$(cat ~/.ssh/id_rsa.pub)" >> sshKeys.pub
 gcloud compute project-info add-metadata --metadata-from-file ssh-keys=sshKeys.pub
 ```
 ## Create the base image for the Compute Engine instances
-Next we will use Packer to create a base image for our Compute Engine VMs which will act as on-demand temporary build executors in Jenkins. You can customize your build image by adding shell commands to the `provisioners` section of the Packer configuration or by adding other Packer provisioners. 
-1. Download and install the latest build of Packer from the Hashicorp website. The following command is using version 1.9.1.
+Next we will use [Packer](https://www.packer.io/) to create a base image for our Compute Engine VMs which will act as on-demand temporary build executors in Jenkins. You can customize your build image by adding shell commands to the `provisioners` section of the Packer configuration or by adding other Packer provisioners. 
+1. Download and install the latest build of Packer from the [Hashicorp website](https://releases.hashicorp.com/packer/). The following command is using version 1.9.1.
 ```
 wget https://releases.hashicorp.com/packer/1.9.1/packer_1.9.1_linux_amd64.zip
 unzip packer_1.9.1_linux_amd64.zip
